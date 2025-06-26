@@ -1,0 +1,115 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Firebase Comment Section</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      max-width: 800px;
+      margin: auto;
+      background-color: #f9f9f9;
+    }
+    h1, p {
+      text-align: center;
+    }
+    #comment-section {
+      margin-top: 40px;
+    }
+    #comments {
+      margin-top: 20px;
+    }
+    .comment {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 8px;
+      margin-bottom: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Welcome to My Website</h1>
+  <p>Leave your comment below!</p>
+
+  <div id="comment-section">
+    <h2>Leave a Comment</h2>
+    <input type="text" id="name" placeholder="Your Name" required />
+    <textarea id="message" placeholder="Your Comment" required></textarea>
+    <button onclick="postComment()">Post Comment</button>
+
+    <div id="comments">
+      <h3>Comments:</h3>
+      <div id="comments-container"></div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK (script tag version) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDOaWa4F5j-r9jHug8ldpZJfR0hv_qwpUY",
+      authDomain: "comments-a4854.firebaseapp.com",
+      databaseURL: "https://comments-a4854-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "comments-a4854",
+      storageBucket: "comments-a4854.appspot.com",
+      messagingSenderId: "934473934261",
+      appId: "1:934473934261:web:016b96dc9b1cf90ede5fc"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function postComment() {
+      const name = document.getElementById('name').value.trim();
+      const message = document.getElementById('message').value.trim();
+
+      if (!name || !message) return alert("Please fill out both fields.");
+
+      const comment = {
+        name: name,
+        message: message,
+        timestamp: Date.now()
+      };
+
+      db.ref('comments').push(comment);
+      document.getElementById('name').value = '';
+      document.getElementById('message').value = '';
+    }
+
+    db.ref('comments').on('value', snapshot => {
+      const container = document.getElementById('comments-container');
+      container.innerHTML = '';
+      const comments = snapshot.val();
+      for (let id in comments) {
+        const c = comments[id];
+        const div = document.createElement('div');
+        div.classList.add('comment');
+        div.innerHTML = `<strong>${c.name}</strong><br>${c.message}`;
+        container.prepend(div);
+      }
+    });
+  </script>
+</body>
+</html>
